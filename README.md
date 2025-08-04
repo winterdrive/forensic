@@ -157,16 +157,9 @@ random_seed = 42          # 隨機種子
 
 ---
 
-## 🔄 推論與融合策略
+## 🔄 推論實驗
 
 ### 多模型推論
-
-#### LLM 推論 (`llm_*_classifier.py`)，用於 ground truth 製備階段
-
-- 結構化 XML 輸入處理
-- 批次推論優化
-- API 失敗重試機制
-- 結果格式標準化
 
 #### BERT 推論 (`bert_*_inference.py`)，用於完整測試資料及與正式資料集
 
@@ -175,30 +168,11 @@ random_seed = 42          # 隨機種子
 - 機率輸出與閾值調整
 - 模型權重自動載入
 
-### 🗳️ 投票融合機制
-
-#### 共識決策 (`majority_vote.py`)
-
-1. **多模型預測整合**：收集所有模型的預測結果
-2. **歧異檢測**：標記模型間預測不一致的案例
-3. **人工介入**：對歧異案例進行人工審查和修正
-4. **最終決策**：結合模型共識和人工校正的最終結果
-
-#### 上傳策略
-
-- **第一次上傳**：使用 train_8000 訓練的模型結果
-- **後續上傳**：
-    - 添加 train_9000 擴充數據訓練的模型
-    - 加入 MacBERT Large 增強預測能力
-    - 根據排名變化動態調整策略
-
 ---
 
 ## 📈 實驗結果
 
 ### 模型表現對比
-
-基於會議記錄和實驗結果：
 
 #### 訓練數據迭代
 
@@ -210,26 +184,12 @@ random_seed = 42          # 隨機種子
 - **姓名分類**：目標準確率 >98%，如未達標考慮 NER 模型
 - **旅遊分類**：通過多輪測試和人工驗證優化
 
-### 🔧 持續優化策略
-
-1. **歧異處理**：
-    - 預賽：檢查所有 mismatch 案例
-    - 正賽：對超過 30,000 筆的預測進行 mismatch 檢查和人工修正
-
-2. **數據清理**：
-    - 姓名分類：過濾掉所有 ○ 和 ＊ 符號
-    - 確保最終上傳數據不超過 30,000 筆限制
-
-3. **模型選擇**：
-    - 根據驗證結果動態選擇最佳模型組合
-    - 保持多個備選方案應對不同測試場景
-
 ### 最佳實驗組別
 
 1. 姓名分類於測試資料集中，透過 train_9000.csv 訓練三模型
-   ckiplab/bert-base-chinese、distilbert-base-multilingual-cased、hfl/chinese-macbert-base 達到 100% 的準確率。
+   ckiplab/bert-base-chinese、distilbert-base-multilingual-cased、hfl/chinese-macbert-base 在第一階段達到 100% 的準確率。
 2. 旅遊分類於測試資料集中，透過 train_8000.csv 訓練三模型
-   ckiplab/bert-base-chinese、distilbert-base-multilingual-cased、hfl/chinese-macbert-base 達到 >99.7% 的準確率。
+   ckiplab/bert-base-chinese、distilbert-base-multilingual-cased、hfl/chinese-macbert-base 在第一階段達到 >99.7% 的準確率。
 
 ---
 
@@ -324,3 +284,21 @@ requests  # HTTP 請求處理
 2. **資料品質控制**：嚴格的人工校驗和歧異處理機制
 3. **模型迭代優化**：基於驗證結果持續改進模型和數據
 4. **多模型融合**：結合多種 BERT 模型進行特徵學習
+
+---
+
+## 正賽
+
+### 🗳️ 信心分數加總機制 (在 [Colab](https://colab.research.google.com/drive/14LA2AULo9yjiDkcsrYvjTYCSPNVNDyq3?usp=sharing) 上進行)
+
+#### 決策方式 
+
+1. **多模型預測整合**：收集所有模型的預測結果並依照模型信心分數加總進行排序
+2. **歧異檢測**：標記模型間預測不一致的案例後進行人工審查
+3. **數據清理**：刪除所有含有 "contentReference" 字樣之 placeholder 所對應的資料
+4. **最終決策**：結合模型共識和數據清理的最終結果
+
+#### 上傳策略
+
+- **第一次**：將先推論好的兩個模型進行決策後上傳 (`ckiplab/bert-base-chinese` & `hfl/chinese-macbert-base` )
+- **第二次**：將最後一個推論好的模型加入決策後上傳 (`distilbert-base-multilingual-cased`)
