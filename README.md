@@ -184,9 +184,9 @@ random_seed = 42          # 隨機種子
 ### 最佳實驗組別
 
 1. 姓名分類於測試資料集中，透過 train_9000.csv 訓練三模型
-   ckiplab/bert-base-chinese、distilbert-base-multilingual-cased、hfl/chinese-macbert-base 在第一階段達到 100% 的準確率。
+   [ckiplab/bert-base-chinese](https://huggingface.co/twmdatagame2025/ckip-bert-chinese-sms-name-classifier-train9000)、[distilbert-base-multilingual-cased](https://huggingface.co/twmdatagame2025/sms-name-distilbert-base-multilingual-cased-train-9000)、[hfl/chinese-macbert-base](https://huggingface.co/twmdatagame2025/both-macbert-base) 在第一階段達到 100% 的準確率。
 2. 旅遊分類於測試資料集中，透過 train_8000.csv 訓練三模型
-   ckiplab/bert-base-chinese、distilbert-base-multilingual-cased、hfl/chinese-macbert-base 在第一階段達到 >99.7% 的準確率。
+   [ckiplab/bert-base-chinese](https://huggingface.co/twmdatagame2025/ckipbert-chinese-sms-travel-classifier)、[distilbert-base-multilingual-cased](https://huggingface.co/twmdatagame2025/sms-travel-distilbert-base-multilingual-cased-train-8000)、[hfl/chinese-macbert-base](https://huggingface.co/twmdatagame2025/both-macbert-base) 在第一階段達到 >99.7% 的準確率。
 
 ---
 
